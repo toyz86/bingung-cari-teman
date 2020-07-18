@@ -1,36 +1,44 @@
 <template>
   <section class="container">
-    <b-row>
-      <!-- di sini section filter -->
-      <b-row class="mb-3" align-h="between">  
-        <b-col cols="4" class="inputFind">
-          <b-form-input v-model="keyword" placeholder="Cari" type="text"></b-form-input>
-        </b-col>
-        <b-col class="d-flex align-items-center" cols="2">
-          <div class="mr-2">Tampilkan</div>
-          <b-form-select
-            :options="[{text:10,value:10},{text:25,value:25},{text:50,value:50},{text:100,value:100}]" 
-            v-model="perPage">
-          </b-form-select>
-        </b-col>
-      </b-row>
-      
-      <!-- di sini bagian table body -->
-      <b-table id="my-table"  
-        :fields="fields"
-        :items="search"
-        :keyword="keyword"
-        :per-page="perPage" 
-        :current-page="currentPage">
-      </b-table>
+    <div class="main-page">
+      <form>
+        <input type="text" v-model="keyword" v-if="noDataResult" placeholder="Cari">
+          <span class="ml-4">Show Per:</span>
+          <span
+              class="navPerPage"
+              :class="perPage === onPerPages && 'active'"
+              v-for="(onPerPages, index) in perPageOptions"
+              :key="index"
+              @click="setPerPage(onPerPages)"
+          >{{onPerPages}}</span>
 
-      <b-pagination
-        v-model="currentPage"
-        :total-rows="rows"
-        :per-page="perPage"
-        aria-controls="my-table">
-      </b-pagination>
-    </b-row>
+      </form>
+
+      <div class="pagination">
+        <button type="button" @click="currentPage--" v-if="currentPage != 1" name="prev">&#8249;</button>
+        <button type="button" v-for="pageNumber in pages.slice(currentPage-1, currentPage+2)" @click="currentPage = pageNumber" :key="pageNumber"> {{pageNumber}} </button>
+        <button type="button" @click="currentPage++" v-if="currentPage < pages.length" name="next">&#8250;</button>
+      </div>
+
+      <table class="table">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">No.</th>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">About</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="comment in showData" v-bind:key="comment" class="data-table">
+              <td scope="row">{{ comment.id }}</td>
+              <td scope="row">{{ comment.name }}</td>
+              <td scope="row">{{ comment.email }}</td>
+              <td scope="row">{{ comment.body }}</td>
+            </tr>
+          </tbody>
+      </table>
+    </div>
   </section>
 </template>
 
@@ -38,43 +46,84 @@
 
 import axios from 'axios'
 
+const perPageOptions = [10, 25, 50, 100]
 // let dataItems = axios.get("https://jsonplaceholder.typicode.com/comments")
 // console.log(dataItems);
 
 export default {
   data () {
     return {
+      perPageOptions,
       comments: [],
+      currentPage: 1,
       perPage: 10,
       keyword: '',
-      currentPage: 1,
-      fields: [
-        { key: 'id', label: 'No.' },
-        { key: 'name', label: 'Name' },
-        { key: 'email', label: 'Email' },
-        { key: 'body', label: 'About' },
-      ]
+      pages: []
     }
   },
-  mounted () {
+
+  methods: {
+    noDataResult () {
+
+    },
+    getData () {
       axios.get("https://jsonplaceholder.typicode.com/comments")
       .then(response => (this.comments = response.data))
       .catch(error => {
         console.log(error);
         this.errored = true
-      })    
+      })
+    },
+
+    setPages () {
+      let numberOfPages = Math.ceil(this.comments.length / this.perPage);
+      for (let index = 1; index <= numberOfPages; index++) {
+        this.pages.push(index);
+      }
+    },
+
+    pagination (comments) {
+      let page = this.currentPage;
+      let perPage = this.perPage;
+      let from = (page * perPage) - perPage;
+      let to = (page * perPage);
+      return this.searchFilter.slice(from, to);
+    },
+
+    setPerPage(onPerPages) {
+      this.perPage = onPerPages
+      this.$emit('totalPerPages', {page: this.currentPage, perPage: onPerPages})
+    },
+
+  },
+
+  created () {
+    this.getData();
+  },
+
+  watch: {
+    comments () {
+      this.setPages();
+    },
   },
 
   computed: {
-    rows() {
-      return this.comments.length
-      console.log(comments.length)
-    },
-    search () {
-      return this.comments.filter(item => {
-        return item.name.includes(this.keyword)
+    searchFilter () {
+      return this.comments.filter(comment => {
+        const searchByName = comment.name.toString().toLowerCase().includes(this.keyword.toLowerCase());
+        const searchByEmail = comment.email.toString().toLowerCase().includes(this.keyword.toLowerCase());
+
+        if (searchByName) {
+          return searchByName;
+        }
+        if (searchByEmail) {
+          return searchByEmail;
+        }
       })
-    }    
+    },
+    showData () {
+      return this.pagination(this.comments)
+    },
   },
 }
 </script>

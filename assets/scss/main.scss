@@ -6,6 +6,48 @@
     align-items: center;
     text-align: center;
 }
+
+.main-page {
+    align-items: center;
+}
+
+.pagination {
+    float: right;
+}
+
+.navPerPage {
+    margin: 0px 5px;
+    cursor: pointer;
+
+    &.active {
+        color: #2997ff;
+    }
+}
+
+button {
+    border-radius: 3px;
+    margin: 0 2px;
+    background-color: white;
+    border: 1px solid black;
+    &:hover {
+        background-color: #bcbec0;
+        border: 1px solid #bcbec0;
+        &.active {
+            background-color: #343a40;
+            color: white;
+        }
+    }
+}
+
+form {
+    float: left;
+    margin-bottom: 10px;
+}
+
+input, button, select, optgroup, textarea {
+    height: 30px;
+}
+
 .col-2 {
     right: -40px;
 }
