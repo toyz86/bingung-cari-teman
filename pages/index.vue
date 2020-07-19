@@ -23,22 +23,22 @@
       </div>
 
       <table class="table">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">No.</th>
-              <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">About</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="comment in showData" v-bind:key="comment" class="data-table">
-              <td scope="row">{{ comment.id }}</td>
-              <td scope="row">{{ comment.name }}</td>
-              <td scope="row">{{ comment.email }}</td>
-              <td scope="row">{{ comment.body }}</td>
-            </tr>
-          </tbody>
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">No.</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">About</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="comment in showData" v-bind:key="comment" class="data-table">
+            <td scope="row">{{ comment.id }}</td>
+            <td scope="row">{{ comment.name }}</td>
+            <td scope="row">{{ comment.email }}</td>
+            <td scope="row">{{ comment.body }}</td>
+          </tr>
+        </tbody>
       </table>
     <button @click="refreshData()">Refresh Data</button>
     </div>
@@ -75,10 +75,9 @@ export default {
             this.comments = response.data;
             setTimeout(() => this.$nuxt.$loading.finish(), 500)
           })
-          .catch(error => {
-            error({ statusCode: 404, message: 'Post not found' })
-            console.log('eror oiiiii', error);
-            this.errored = true
+          .catch((err) => {
+            console.log(err);
+            error({ statusCode: 404, message: 'Data tidak ditemukan' })
           })
       })
     },
@@ -150,7 +149,7 @@ export default {
     },
     rowOnPage () {
       return Math.ceil(this.comments.length / this.perPage);
-    }
+    },
   },
 }
 </script>

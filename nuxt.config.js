@@ -50,6 +50,14 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    {
+      src: '~plugins/axios.js',
+      ssr: true,
+    },
+    {
+      src: '~plugins/errorHandler.js',
+      ssr: true,
+    },
   ],
   /*
   ** Auto import components
