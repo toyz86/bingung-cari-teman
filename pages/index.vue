@@ -15,9 +15,11 @@
       </form>
 
       <div class="pagination">
-        <button type="button" @click="currentPage--" v-if="currentPage != 1" name="prev">&#8249;</button>
+        <button type="button" @click="onFirstPage()">First</button>
+        <button type="button" @click="prev()">&#8249;</button>
         <button type="button" v-for="pageNumber in pages.slice(currentPage-1, currentPage+2)" @click="currentPage = pageNumber" :key="pageNumber"> {{pageNumber}} </button>
-        <button type="button" @click="currentPage++" v-if="currentPage < pages.length" name="next">&#8250;</button>
+        <button type="button" @click="next()">&#8250;</button>
+        <button type="button" @click="onLastPage()">Last</button>
       </div>
 
       <table class="table">
@@ -47,8 +49,6 @@
 import axios from 'axios'
 
 const perPageOptions = [10, 25, 50, 100]
-// let dataItems = axios.get("https://jsonplaceholder.typicode.com/comments")
-// console.log(dataItems);
 
 export default {
   data () {
@@ -58,7 +58,7 @@ export default {
       currentPage: 1,
       perPage: 10,
       keyword: '',
-      pages: []
+      pages: [],
     }
   },
 
@@ -67,16 +67,24 @@ export default {
 
     },
     getData () {
-      axios.get("https://jsonplaceholder.typicode.com/comments")
-      .then(response => (this.comments = response.data))
-      .catch(error => {
-        console.log(error);
-        this.errored = true
+      this.$nextTick(() => {
+        this.$nuxt.$loading.start();
+          axios.get("https://jsonplaceholder.typicode.com/comments")
+          .then(response => {
+            this.comments = response.data;
+            setTimeout(() => this.$nuxt.$loading.finish(), 500)
+          })
+          .catch(error => {
+            error({ statusCode: 404, message: 'Post not found' })
+            console.log('eror oiiiii', error);
+            this.errored = true
+          })
       })
     },
 
     setPages () {
       let numberOfPages = Math.ceil(this.comments.length / this.perPage);
+      console.log("total halaman", numberOfPages);
       for (let index = 1; index <= numberOfPages; index++) {
         this.pages.push(index);
       }
@@ -94,7 +102,22 @@ export default {
       this.perPage = onPerPages
       this.$emit('totalPerPages', {page: this.currentPage, perPage: onPerPages})
     },
-
+    onFirstPage() {
+      this.currentPage = 1;
+    },
+    onLastPage() {
+      this.currentPage = this.rowOnPage;
+    },
+    prev() {
+      if (this.currentPage != 1) {
+        this.currentPage--;
+      }
+    },
+    next() {
+      if (this.currentPage < this.rowOnPage) {
+        this.currentPage++;
+      }
+    }
   },
 
   created () {
@@ -124,6 +147,9 @@ export default {
     showData () {
       return this.pagination(this.comments)
     },
+    rowOnPage () {
+      return Math.ceil(this.comments.length / this.perPage);
+    }
   },
 }
 </script>

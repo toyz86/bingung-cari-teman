@@ -44,6 +44,7 @@ export default {
       lang: 'scss'
     }
   ],
+  loading: '~/components/loading.vue',
   /*
   ** Plugins to load before mounting the App
   ** https://nuxtjs.org/guide/plugins
