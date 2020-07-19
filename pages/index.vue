@@ -2,7 +2,7 @@
   <section class="container">
     <div class="main-page">
       <form>
-        <input type="text" v-model="keyword" v-if="noDataResult" placeholder="Cari">
+        <input type="text" v-model="keyword" placeholder="Cari">
           <span class="ml-4">Show Per:</span>
           <span
               class="navPerPage"
@@ -40,6 +40,7 @@
             </tr>
           </tbody>
       </table>
+    <button @click="refreshData()">Refresh Data</button>
     </div>
   </section>
 </template>
@@ -63,8 +64,8 @@ export default {
   },
 
   methods: {
-    noDataResult () {
-
+    refreshData () {
+      window.location.reload();
     },
     getData () {
       this.$nextTick(() => {
