@@ -18,9 +18,9 @@
         <button class="pagination-button" @click="onFirstPage()">First</button>
         <button class="pagination-button" @click="prev()">&#8249;</button>
        
-        <button class="pagination-button" v-for="(item, index) in pages.slice(currentPage-1, currentPage+3)" 
-          :class="{ 'active': activeIndex === index }" 
-          :key="index" @click="setPagination(index)">{{ index +1 }}
+        <button class="pagination-button" v-for=" item in pages.slice(currentPage-1, currentPage+2)" 
+          :class="{ 'active': item === currentPage }" 
+          :key="item" @click="setPagination(item)">{{ item }}
         </button>
 
         <button class="pagination-button" @click="next()">&#8250;</button>
@@ -60,7 +60,6 @@ const perPageOptions = [10, 25, 50, 100]
 export default {
   data () {
     return {
-      activeIndex: undefined,
       perPageOptions,
       comments: [],
       currentPage: 1,
@@ -72,9 +71,8 @@ export default {
   },
 
   methods: {
-    setPagination(index){
-      this.activeIndex = index
-      this.currentPage = index + 1
+    setPagination(item){
+      this.currentPage = item
     },
     refreshData () {
       window.location.reload();
@@ -124,6 +122,7 @@ export default {
     },
     onFirstPage() {
       this.currentPage = 1;
+      this.selectHandler();
     },
     onLastPage() {
       this.currentPage = this.rowOnPage;
