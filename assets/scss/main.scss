@@ -9,10 +9,13 @@
 
 .main-page {
     align-items: center;
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .pagination {
     float: right;
+    margin-bottom: 10px;
 }
 
 .navPerPage {
@@ -24,6 +27,15 @@
     }
 }
 
+.pagination-button {
+    border-radius: 3px;
+    margin: 2px;
+    &.active {
+        background-color: #343a40;
+        color: white;
+    }
+}
+
 button {
     border-radius: 3px;
     margin: 0 2px;
@@ -32,16 +44,13 @@ button {
     &:hover {
         background-color: #bcbec0;
         border: 1px solid #bcbec0;
-        &.active {
-            background-color: #343a40;
-            color: white;
-        }
     }
 }
 
 form {
-    float: left;
+    // float: left;
     margin-bottom: 10px;
+    display: inline-block;
 }
 
 input, button, select, optgroup, textarea {

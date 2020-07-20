@@ -4,22 +4,28 @@
       <form>
         <input type="text" v-model="keyword" placeholder="Cari">
           <span class="ml-4">Show Per:</span>
-          <span
-              class="navPerPage"
-              :class="perPage === onPerPages && 'active'"
-              v-for="(onPerPages, index) in perPageOptions"
-              :key="index"
-              @click="setPerPage(onPerPages)"
+
+          <span class="navPerPage"
+            :class="perPage === onPerPages && 'active'"
+            v-for="(onPerPages, index) in perPageOptions"
+            :key="index"
+            @click="setPerPage(onPerPages)"
           >{{onPerPages}}</span>
 
       </form>
 
       <div class="pagination">
-        <button type="button" @click="onFirstPage()">First</button>
-        <button type="button" @click="prev()">&#8249;</button>
-        <button type="button" v-for="pageNumber in pages.slice(currentPage-1, currentPage+2)" @click="currentPage = pageNumber" :key="pageNumber"> {{pageNumber}} </button>
-        <button type="button" @click="next()">&#8250;</button>
-        <button type="button" @click="onLastPage()">Last</button>
+        <button class="pagination-button" @click="onFirstPage()">First</button>
+        <button class="pagination-button" @click="prev()">&#8249;</button>
+       
+        <button class="pagination-button" v-for="(item, index) in pages.slice(currentPage-1, currentPage+3)" 
+          :class="{ 'active': activeIndex === index }" 
+          :key="index" @click="setPagination(index)">{{ index +1 }}
+        </button>
+
+        <button class="pagination-button" @click="next()">&#8250;</button>
+        <button class="pagination-button" @click="onLastPage()">Last</button>
+
       </div>
 
       <table class="table">
@@ -54,16 +60,22 @@ const perPageOptions = [10, 25, 50, 100]
 export default {
   data () {
     return {
+      activeIndex: undefined,
       perPageOptions,
       comments: [],
       currentPage: 1,
       perPage: 10,
       keyword: '',
       pages: [],
+      paginationTotal: 0,
     }
   },
 
   methods: {
+    setPagination(index){
+      this.activeIndex = index
+      this.currentPage = index + 1
+    },
     refreshData () {
       window.location.reload();
     },
@@ -72,10 +84,11 @@ export default {
         this.$nuxt.$loading.start();
           axios.get("https://jsonplaceholder.typicode.com/comments")
           .then(response => {
-            this.comments = response.data;
             setTimeout(() => this.$nuxt.$loading.finish(), 500)
+            this.comments = response.data;
           })
           .catch((err) => {
+            this.$nuxt.$loading.finish()
             console.log(err);
             error({ statusCode: 404, message: 'Data tidak ditemukan' })
           })
@@ -92,15 +105,22 @@ export default {
 
     pagination (comments) {
       let page = this.currentPage;
+      console.log('page', page)
       let perPage = this.perPage;
+      console.log('per page', perPage)
       let from = (page * perPage) - perPage;
+      console.log('from', from);
       let to = (page * perPage);
+      console.log('to', to);
       return this.searchFilter.slice(from, to);
     },
-
     setPerPage(onPerPages) {
-      this.perPage = onPerPages
-      this.$emit('totalPerPages', {page: this.currentPage, perPage: onPerPages})
+      this.perPage = onPerPages;
+      return this.updatePagination();
+    },
+    updatePagination(){
+      this.currentPage = 1;
+      this.paginationTotal = Math.ceil(this.comments.length / this.perPage);
     },
     onFirstPage() {
       this.currentPage = 1;
@@ -114,10 +134,10 @@ export default {
       }
     },
     next() {
-      if (this.currentPage < this.rowOnPage) {
+      if (this.currentPage < this.pages.length) {
         this.currentPage++;
       }
-    }
+    },
   },
 
   created () {
