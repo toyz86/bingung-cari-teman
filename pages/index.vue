@@ -12,6 +12,13 @@
             @click="setPerPage(onPerPages)"
           >{{onPerPages}}</span>
 
+          <!-- <select v-model="pageSizeModel">
+            <option value="3">3</option>
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+          </select> -->
+
       </form>
 
       <div class="pagination">
@@ -31,10 +38,10 @@
       <table class="table">
         <thead class="thead-dark">
           <tr>
-            <th scope="col">No.</th>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">About</th>
+            <th v-for="column in columns" 
+              :key="column" 
+              @click="sortTable()">{{column}}
+            </th>           
           </tr>
         </thead>
         <tbody>
@@ -46,6 +53,7 @@
           </tr>
         </tbody>
       </table>
+
     <button @click="refreshData()">Refresh Data</button>
     </div>
   </section>
@@ -66,11 +74,16 @@ export default {
       perPage: 10,
       keyword: '',
       pages: [],
-      paginationTotal: 0,
+      columns: ['Id', 'Name', 'Email', 'About'],
+      prevKey: 'name',
+      orderDesc: false, 
     }
   },
 
   methods: {
+    sortTable () {
+      this.comments.sort()
+    },
     setPagination(item){
       this.currentPage = item
     },
@@ -103,22 +116,17 @@ export default {
 
     pagination (comments) {
       let page = this.currentPage;
-      console.log('page', page)
+      // console.log('page', page)
       let perPage = this.perPage;
-      console.log('per page', perPage)
+      // console.log('per page', perPage)
       let from = (page * perPage) - perPage;
-      console.log('from', from);
+      // console.log('from', from);
       let to = (page * perPage);
-      console.log('to', to);
+      // console.log('to', to);
       return this.searchFilter.slice(from, to);
     },
     setPerPage(onPerPages) {
       this.perPage = onPerPages;
-      return this.updatePagination();
-    },
-    updatePagination(){
-      this.currentPage = 1;
-      this.paginationTotal = Math.ceil(this.comments.length / this.perPage);
     },
     onFirstPage() {
       this.currentPage = 1;
@@ -126,17 +134,21 @@ export default {
     },
     onLastPage() {
       this.currentPage = this.rowOnPage;
+      this.selectHandler();
     },
     prev() {
       if (this.currentPage != 1) {
         this.currentPage--;
+        this.selectHandler();
       }
     },
     next() {
       if (this.currentPage < this.pages.length) {
         this.currentPage++;
+        this.selectHandler();
       }
     },
+    selectHandler() {},
   },
 
   created () {
