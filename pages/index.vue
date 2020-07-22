@@ -11,14 +11,6 @@
             :key="index"
             @click="setPerPage(onPerPages)"
           >{{onPerPages}}</span>
-
-          <!-- <select v-model="pageSizeModel">
-            <option value="3">3</option>
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="25">25</option>
-          </select> -->
-
       </form>
 
       <div class="pagination">
@@ -75,8 +67,6 @@ export default {
       keyword: '',
       pages: [],
       columns: ['Id', 'Name', 'Email', 'About'],
-      prevKey: 'name',
-      orderDesc: false, 
     }
   },
 
@@ -114,6 +104,13 @@ export default {
       }
     },
 
+    updateCurrent() {
+      this.currentPage = i;
+    },
+    updatePagination() {
+      this.currentPage = 1;
+      this.pages = Math.ceil(document.querySelectorAll('tbody tr').length / this.onPerPages)
+    },        
     pagination (comments) {
       let page = this.currentPage;
       // console.log('page', page)
@@ -130,25 +127,20 @@ export default {
     },
     onFirstPage() {
       this.currentPage = 1;
-      this.selectHandler();
     },
     onLastPage() {
       this.currentPage = this.rowOnPage;
-      this.selectHandler();
     },
     prev() {
       if (this.currentPage != 1) {
         this.currentPage--;
-        this.selectHandler();
       }
     },
     next() {
       if (this.currentPage < this.pages.length) {
         this.currentPage++;
-        this.selectHandler();
       }
     },
-    selectHandler() {},
   },
 
   created () {
@@ -159,6 +151,10 @@ export default {
     comments () {
       this.setPages();
     },
+    keyword() {
+      if (this.currentPage > this.rowOnPage)
+        this.currentPage = this.rowOnPage
+    }
   },
 
   computed: {
