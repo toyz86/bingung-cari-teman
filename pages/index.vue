@@ -13,11 +13,11 @@
           >{{onPerPages}}</span>
       </form>
 
-      <div class="pagination">
+      <div class="pagination mb-10">
         <button class="pagination-button" @click="onFirstPage()">First</button>
         <button class="pagination-button" @click="prev()">&#8249;</button>
        
-        <button class="pagination-button" v-for=" item in pages.slice(currentPage-1, currentPage+2)" 
+        <button class="pagination-button" v-for=" item in rowOnPage" 
           :class="{ 'active': item === currentPage }" 
           :key="item" @click="setPagination(item)">{{ item }}
         </button>
@@ -30,14 +30,14 @@
       <table class="table">
         <thead class="thead-dark">
           <tr>
-            <th v-for="column in columns" 
-              :key="column" 
-              @click="sortTable()">{{column}}
+            <th v-for="col in columns" 
+              :key="col" 
+              @click="sortTable(col)">{{col}}
             </th>           
           </tr>
         </thead>
         <tbody>
-          <tr v-for="comment in showData" v-bind:key="comment" class="data-table">
+          <tr v-for="comment in pagination (comments)" v-bind:key="comment" class="data-table">
             <td scope="row">{{ comment.id }}</td>
             <td scope="row">{{ comment.name }}</td>
             <td scope="row">{{ comment.email }}</td>
@@ -68,15 +68,15 @@ export default {
       comments: [],
       currentPage: 1,
       perPage: 10,
+      pageRange: 5,
       keyword: '',
-      pages: [],
       columns: ['Id', 'Name', 'Email', 'About'],
     }
   },
 
   methods: {
-    sortTable () {
-      this.comments.sort()
+    sortTable (clickCol) {
+      console.log('sort', clickCol);
     },
     setPagination(item){
       this.currentPage = item
@@ -85,32 +85,19 @@ export default {
       window.location.reload();
     },
     getData () {
-      axios.get("https://jsonplaceholder.typicode.com/comments", {delay: 5000})
+      axios.get("https://jsonplaceholder.typicode.com/comments")
       .then(response => {
         this.comments = response.data;
       })
-      .catch((err) => {
+      .catch((err) => { 
         console.log(err);
         error({ statusCode: 404, message: 'Data tidak ditemukan' })
       })
     },
-
-    setPages () {
-      let numberOfPages = Math.ceil(this.comments.length / this.perPage);
-      console.log("total halaman", numberOfPages);
-      for (let index = 1; index <= numberOfPages; index++) {
-        this.pages.push(index);
-      }
-    },
-
-    updateCurrent() {
-      this.currentPage = i;
-    },
-    updatePagination() {
-      this.currentPage = 1;
-      this.pages = Math.ceil(document.querySelectorAll('tbody tr').length / this.onPerPages)
-    },        
+  
     pagination (comments) {
+      let range = Math.ceil(this.pageRange / 2);
+      console.log('range', range);
       let page = this.currentPage;
       // console.log('page', page)
       let perPage = this.perPage;
@@ -136,7 +123,7 @@ export default {
       }
     },
     next() {
-      if (this.currentPage < this.pages.length) {
+      if (this.currentPage < this.rowOnPage) {
         this.currentPage++;
       }
     },
@@ -147,12 +134,12 @@ export default {
   },
 
   watch: {
-    comments () {
-      this.setPages();
-    },
     keyword() {
       if (this.currentPage > this.numberOfPages)
         this.currentPage = this.numberOfPages
+    },
+    rowOnPage () {
+      this.currentPage = 1;
     }
   },
 
@@ -172,9 +159,6 @@ export default {
           return searchByEmail;
         }
       })
-    },
-    showData () {
-      return this.pagination(this.comments)
     },
     rowOnPage () {
       return Math.ceil(this.comments.length / this.perPage);
