@@ -1,10 +1,10 @@
 <template>
   <section class="container">
+    <loader v-if="onLoading" />
     <div class="main-page">
       <form>
         <input type="text" v-model="keyword" placeholder="Cari">
           <span class="ml-4">Show Per:</span>
-
           <span class="navPerPage"
             :class="perPage === onPerPages && 'active'"
             v-for="(onPerPages, index) in perPageOptions"
@@ -54,10 +54,14 @@
 <script>
 
 import axios from 'axios'
+import Loader from '~/components/loader.vue'
 
 const perPageOptions = [10, 25, 50, 100]
 
 export default {
+  components: {
+    Loader
+  },
   data () {
     return {
       perPageOptions,
@@ -81,18 +85,13 @@ export default {
       window.location.reload();
     },
     getData () {
-      this.$nextTick(() => {
-        this.$nuxt.$loading.start();
-          axios.get("https://jsonplaceholder.typicode.com/comments")
-          .then(response => {
-            setTimeout(() => this.$nuxt.$loading.finish(), 500)
-            this.comments = response.data;
-          })
-          .catch((err) => {
-            this.$nuxt.$loading.finish()
-            console.log(err);
-            error({ statusCode: 404, message: 'Data tidak ditemukan' })
-          })
+      axios.get("https://jsonplaceholder.typicode.com/comments", {delay: 5000})
+      .then(response => {
+        this.comments = response.data;
+      })
+      .catch((err) => {
+        console.log(err);
+        error({ statusCode: 404, message: 'Data tidak ditemukan' })
       })
     },
 
@@ -152,16 +151,19 @@ export default {
       this.setPages();
     },
     keyword() {
-      if (this.currentPage > this.rowOnPage)
-        this.currentPage = this.rowOnPage
+      if (this.currentPage > this.numberOfPages)
+        this.currentPage = this.numberOfPages
     }
   },
 
   computed: {
+    onLoading() {
+      return (this.comments.length <= 0)
+    },
     searchFilter () {
       return this.comments.filter(comment => {
-        const searchByName = comment.name.toString().toLowerCase().includes(this.keyword.toLowerCase());
-        const searchByEmail = comment.email.toString().toLowerCase().includes(this.keyword.toLowerCase());
+        const searchByName = comment.name.toString().toLowerCase().match(this.keyword.toLowerCase());
+        const searchByEmail = comment.email.toString().toLowerCase().match(this.keyword.toLowerCase());
 
         if (searchByName) {
           return searchByName;
