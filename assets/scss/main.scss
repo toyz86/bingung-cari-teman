@@ -15,7 +15,7 @@
 
 .pagination {
     // float: right;
-    margin-bottom: 10px;
+    margin: 0 0 10px;
     display: inline;
 }
 
@@ -99,6 +99,14 @@ input, button, select, optgroup, textarea {
 td {
     text-align: left;
     color: #343a40;
+}
+
+th {
+    cursor: pointer;
+}
+
+.table .thead-dark th:hover {
+    color: #2997ff;
 }
 
 .subtitle {

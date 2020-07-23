@@ -13,7 +13,7 @@
           >{{onPerPages}}</span>
       </form>
 
-      <div class="pagination mb-10">
+      <div class="pagination">
         <button class="pagination-button" @click="onFirstPage()">First</button>
         <button class="pagination-button" @click="prev()">&#8249;</button>
        
@@ -24,9 +24,8 @@
 
         <button class="pagination-button" @click="next()">&#8250;</button>
         <button class="pagination-button" @click="onLastPage()">Last</button>
-
       </div>
-
+      <!-- debug: sortTable={{curSort}}, dir={{curSortDir}} -->
       <table class="table">
         <thead class="thead-dark">
           <tr>
@@ -37,7 +36,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="comment in pagination (comments)" v-bind:key="comment" class="data-table">
+          <tr v-for="comment in pagination()" :key="comment.key" class="data-table">
             <td scope="row">{{ comment.id }}</td>
             <td scope="row">{{ comment.name }}</td>
             <td scope="row">{{ comment.email }}</td>
@@ -71,12 +70,43 @@ export default {
       pageRange: 5,
       keyword: '',
       columns: ['Id', 'Name', 'Email', 'About'],
+      curSort:'ID',
+      curSortDir:'asce',
+      sortElm: 'id',
     }
   },
 
   methods: {
     sortTable (clickCol) {
-      console.log('sort', clickCol);
+      // console.log('sort', clickCol);
+      this.curSort = clickCol;
+      
+      var sortElm;
+      switch(clickCol) {
+        case "Name":
+          this.sortElm = "name";
+          // console.log('ini', this.sortElm)
+          break;
+        case "Email":
+          this.sortElm = "email";
+          // console.log('ini', this.sortElm)
+          break;
+        case "About":
+          this.sortElm = "body";
+          // console.log('ini', this.sortElm)
+          break;                  
+        default:
+          this.sortElm = "id";
+          // console.log('ini', this.sortElm)
+      }
+      this.curSortDir = this.curSortDir === 'asce'? 'desc':'asce';
+      this.comments.sort((a, b) => {
+        let dir = 1;
+        if (this.curSortDir === 'desc') dir = -1
+        if (a[this.sortElm] < b[this.sortElm]) return -1 * dir;
+        if (a[this.sortElm] > b[this.sortElm]) return 1 * dir;
+        return 0;
+      })
     },
     setPagination(item){
       this.currentPage = item
