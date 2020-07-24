@@ -14,18 +14,19 @@
       </form>
 
       <div class="pagination">
-        <button class="pagination-button" @click="onFirstPage()">First</button>
-        <button class="pagination-button" @click="prev()">&#8249;</button>
+        <button class="pagination-button" @click="onFirstPage()" :disabled="this.currentPage <= 1">First</button>
+        <button class="pagination-button" @click="prev()" :disabled="this.currentPage <= 1">&#8249;</button>
        
         <button class="pagination-button" v-for=" item in rowOnPage" 
           :class="{ 'active': item === currentPage }" 
           :key="item" @click="setPagination(item)">{{ item }}
         </button>
 
-        <button class="pagination-button" @click="next()">&#8250;</button>
-        <button class="pagination-button" @click="onLastPage()">Last</button>
+        <button class="pagination-button" @click="next()" :disabled="this.currentPage == rowOnPage">&#8250;</button>
+        <button class="pagination-button" @click="onLastPage()" :disabled="this.currentPage == rowOnPage">Last</button>
       </div>
       <!-- debug: sortTable={{curSort}}, dir={{curSortDir}} -->
+      <div class="find-person"><strong>{{searchFilter.length}}</strong> of {{comments.length}} person found</div>
       <table class="table">
         <thead class="thead-dark">
           <tr>
@@ -126,8 +127,8 @@ export default {
     },
   
     pagination (comments) {
-      let range = Math.ceil(this.pageRange / 2);
-      console.log('range', range);
+      // let range = Math.ceil(this.pageRange / 2);
+      // console.log('range', range);
       let page = this.currentPage;
       // console.log('page', page)
       let perPage = this.perPage;
@@ -165,8 +166,9 @@ export default {
 
   watch: {
     keyword() {
-      if (this.currentPage > this.numberOfPages)
-        this.currentPage = this.numberOfPages
+      if (this.currentPage > this.rowOnPage) {
+        this.currentPage = this.rowOnPage
+      }
     },
     rowOnPage () {
       this.currentPage = 1;
@@ -191,7 +193,7 @@ export default {
       })
     },
     rowOnPage () {
-      return Math.ceil(this.comments.length / this.perPage);
+      return Math.ceil(this.searchFilter.length / this.perPage);
     },
   },
 }

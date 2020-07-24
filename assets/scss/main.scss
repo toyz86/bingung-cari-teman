@@ -42,9 +42,13 @@ button {
     margin: 0 2px;
     background-color: white;
     border: 1px solid black;
-    &:hover {
+    &:hover:enabled {
         background-color: #bcbec0;
         border: 1px solid #bcbec0;
+    }
+    &:disabled {
+        border: 1px solid #bcbec0;
+        cursor: auto;
     }
 }
 
@@ -119,4 +123,9 @@ th {
 
 .links {
     padding-top: 15px;
+}
+
+.find-person {
+    font-size: 14px;
+    margin: 5px;
 }
