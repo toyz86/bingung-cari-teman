@@ -46,7 +46,7 @@
         </tbody>
       </table>
 
-    <button @click="refreshData()">Refresh Data</button>
+    <button @click="getData()">Refresh Data</button>
     </div>
   </section>
 </template>
